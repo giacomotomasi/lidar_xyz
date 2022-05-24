@@ -1,5 +1,5 @@
 pointcloud_topic:
-    camera_topic: /velodyne/points
+    camera_topic: /velodyne_points
 
 reference_frame:
     frame_id: velodyne
