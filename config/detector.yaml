@@ -1,0 +1,35 @@
+pointcloud_topic:
+    camera_topic: /velodyne/points
+
+reference_frame:
+    frame_id: velodyne
+
+voxel_grid:
+    x: 0.01
+    y: 0.01
+    z: 0.01
+    enable: true
+    
+pass_through:
+    z_min: 0.0
+    z_max: 0.7
+    enable: true
+
+segmentation:
+    distance_threshold: 0.01
+    enable: true
+    
+outlier_removal:
+    meanK: 50
+    standard_dev_mult: 1.0
+    enable: true
+    
+cluster_extraction:
+    cluster_tolerance: 0.06
+    min_cluster_size: 10
+    max_cluster_size: 250
+    enable: true
+    
+    
+    
+
