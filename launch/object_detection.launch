@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <launch>
 
-    <include file="$(find realsense_devel)/launch/realsense_pointcloud.launch" />
-    <rosparam file="$(find realsense_devel)/config/detector.yaml" />
-    <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find realsense_devel)/rviz/sim_bbox.rviz"/>
-    <node name="detector_node" pkg="realsense_devel" type="detector_node" output="screen" />
-    <node name="bbox_node" pkg="realsense_devel" type="bbox_node" output="screen" />
+    <include file="$(find velodyne)/velodyne_pointcloud/launch/VLP16_points.launch" />
+    <rosparam file="$(find lidar_xyz)/config/detector_xyz.yaml" />
+    <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find lidar_xyz)/rviz/sim_bbox.rviz"/>
+    <node name="detector_xyz_node" pkg="lidar_xyz" type="detector_xyz_node" output="screen" />
+    <node name="bbox_xyz_node" pkg="lidar_xyz" type="bbox_xyz_node" output="screen" />
 
 </launch> 
