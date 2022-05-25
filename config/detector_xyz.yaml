@@ -14,8 +14,8 @@ pass_through:
     x_min: 0.0
     x_max: 2.0
     x_enable: true
-    y_min: 0.0
-    y_max: 5.0
+    y_min: -2.5
+    y_max: 2.5
     y_enable: true
     z_min: -5.0
     z_max: 5.0
@@ -31,8 +31,8 @@ outlier_removal:
     enable: false
     
 cluster_extraction:
-    cluster_tolerance: 0.06
-    min_cluster_size: 10
+    cluster_tolerance: 0.1
+    min_cluster_size: 50
     max_cluster_size: 250
     enable: false
     
