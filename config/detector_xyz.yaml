@@ -11,8 +11,12 @@ voxel_grid:
     enable: false
     
 pass_through:
+    x_min: 0.0
+    x_max: 2.0
+    y_min: 0.0
+    y_max: 5.0
     z_min: 0.0
-    z_max: 0.7
+    z_max: 0.0
     enable: false
 
 segmentation:

@@ -32,6 +32,10 @@ private:
     double size_z {};
     bool voxel_grid_enabled;
     // pass through parameters
+    double x_min {};
+    double x_max {};
+    double y_min {};
+    double y_max {};
     double z_min {};
     double z_max {};
     bool pass_through_enabled;

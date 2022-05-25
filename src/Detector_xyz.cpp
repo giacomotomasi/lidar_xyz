@@ -85,6 +85,12 @@ void Detector::pass_through(){
      * y of pcl is x of camera_link
      * z of pcl is y of camera_link
     */
+    pass.setFilterFieldName ("x");
+    pass.setFilterLimits (x_min,x_max);
+    pass.filter (*cloud);
+    pass.setFilterFieldName ("y");
+    pass.setFilterLimits (y_min,y_max);
+    pass.filter (*cloud);
     pass.setFilterFieldName ("z");
     pass.setFilterLimits (z_min,z_max);
     pass.filter (*cloud);
@@ -192,8 +198,12 @@ Detector::Detector(ros::NodeHandle *n1){
     n1->param("/voxel_grid/y",size_y,0.05);
     n1->param("/voxel_grid/z",size_z,0.05);
     n1->param("/voxel_grid/enable",voxel_grid_enabled,false);
-    n1->param("/pass_through/z_min",z_min,0.0);
-    n1->param("/pass_through/z_max",z_max,1.0);
+    n1->param("/pass_through/x_min",x_min,0.0);
+    n1->param("/pass_through/x_max",x_max,2.0);
+    n1->param("/pass_through/y_min",y_min,0.0);
+    n1->param("/pass_through/y_max",y_max,5.0);
+    n1->param("/pass_through/z_min",z_min,-5.0);
+    n1->param("/pass_through/z_max",z_max,5.0);
     n1->param("/pass_through/enable",pass_through_enabled,true);
     n1->param("/segmentation/distance_threshold",distance_threshold,0.01);
     n1->param("/segmentation/enable",segmentation_enabled,true);
