@@ -13,11 +13,13 @@ voxel_grid:
 pass_through:
     x_min: 0.0
     x_max: 2.0
+    x_enable: true
     y_min: 0.0
     y_max: 5.0
-    z_min: 0.0
-    z_max: 0.0
-    enable: false
+    y_enable: true
+    z_min: -5.0
+    z_max: 5.0
+    z_enable: true
 
 segmentation:
     distance_threshold: 0.01

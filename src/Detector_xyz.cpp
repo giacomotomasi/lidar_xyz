@@ -53,7 +53,7 @@ void Detector::cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     
     if (voxel_grid_enabled)
         Detector::voxel_grid();
-    if (pass_through_enabled)
+    if (x_pass_through_enabled || y_pass_through_enabled || z_pass_through_enabled)
         Detector::pass_through();
     if (segmentation_enabled)
         Detector::segmentation();
@@ -85,15 +85,21 @@ void Detector::pass_through(){
      * y of pcl is x of camera_link
      * z of pcl is y of camera_link
     */
-    pass.setFilterFieldName ("x");
-    pass.setFilterLimits (x_min,x_max);
-    pass.filter (*cloud);
-    pass.setFilterFieldName ("y");
-    pass.setFilterLimits (y_min,y_max);
-    pass.filter (*cloud);
-    pass.setFilterFieldName ("z");
-    pass.setFilterLimits (z_min,z_max);
-    pass.filter (*cloud);
+    if (x_pass_through_enabled){
+        pass.setFilterFieldName ("x");
+        pass.setFilterLimits (x_min,x_max);
+        pass.filter (*cloud);
+        }
+    if (y_pass_through_enabled){
+        pass.setFilterFieldName ("y");
+        pass.setFilterLimits (y_min,y_max);
+        pass.filter (*cloud);
+        }
+    if (z_pass_through_enabled){
+        pass.setFilterFieldName ("z");
+        pass.setFilterLimits (z_min,z_max);
+        pass.filter (*cloud);
+        }
     }
 
 void Detector::segmentation(){
@@ -199,12 +205,14 @@ Detector::Detector(ros::NodeHandle *n1){
     n1->param("/voxel_grid/z",size_z,0.05);
     n1->param("/voxel_grid/enable",voxel_grid_enabled,false);
     n1->param("/pass_through/x_min",x_min,0.0);
-    n1->param("/pass_through/x_max",x_max,2.0);
+    n1->param("/pass_through/x_max",x_max,5.0);
+    n1->param("/pass_through/x_enable",x_pass_through_enabled,true);
     n1->param("/pass_through/y_min",y_min,0.0);
     n1->param("/pass_through/y_max",y_max,5.0);
+    n1->param("/pass_through/y_enable",y_pass_through_enabled,true);
     n1->param("/pass_through/z_min",z_min,-5.0);
     n1->param("/pass_through/z_max",z_max,5.0);
-    n1->param("/pass_through/enable",pass_through_enabled,true);
+    n1->param("/pass_through/z_enable",z_pass_through_enabled,false);
     n1->param("/segmentation/distance_threshold",distance_threshold,0.01);
     n1->param("/segmentation/enable",segmentation_enabled,true);
     n1->param("/outlier_removal/meanK",meanK,50);

@@ -34,11 +34,13 @@ private:
     // pass through parameters
     double x_min {};
     double x_max {};
+    bool x_pass_through_enabled;
     double y_min {};
     double y_max {};
+    bool y_pass_through_enabled;
     double z_min {};
     double z_max {};
-    bool pass_through_enabled;
+    bool z_pass_through_enabled;
     // segmentation parameters
     double distance_threshold{};
     bool segmentation_enabled;
