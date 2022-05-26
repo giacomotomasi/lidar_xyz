@@ -41,7 +41,7 @@ void Detector::cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
 
     transform->translation.x = 0.0;
     transform->translation.y = 0.0;
-    transform->translation.z = 0.0;
+    transform->translation.z = 1.45;
     
     transform->rotation.x = q.x();
     transform->rotation.y = q.y();
@@ -53,6 +53,7 @@ void Detector::cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     
     // convert cloud to pcl::PointXYZRGB
     pcl::fromROSMsg (*cloud_msg, *trans_pointcloud);
+    //trans_pointcloud->header.frame_id = "base_link";
     
     pcl_ros::transformPointCloud(*trans_pointcloud, *cloud, *transform);
     
@@ -194,6 +195,7 @@ void Detector::publish(){
     // reconvert to PointCloud2 to be ROS compatible
     pcl::PCLPointCloud2::Ptr cloud_ros (new pcl::PCLPointCloud2());
     pcl::toPCLPointCloud2(*cloud, *cloud_ros);
+    cloud_ros->header.frame_id = "base_link";
     cloud_pub.publish(cloud_ros);
     //std::cout << "Point Cloud width: %d " << cloud->width << std::endl;
     }

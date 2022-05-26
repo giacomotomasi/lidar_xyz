@@ -40,7 +40,7 @@ void BoundingBox_moi::clusters_callback(const lidar_xyz::ClustersArray::ConstPtr
         (*bbox_markers).markers.push_back(marker);
         (*bbox_markers).markers.push_back(text_marker);
         }
-    rviz_visual_tools::RvizVisualTools *visual_toolPtr = new rviz_visual_tools::RvizVisualTools("camera_link", "bbox_marker");
+    rviz_visual_tools::RvizVisualTools *visual_toolPtr = new rviz_visual_tools::RvizVisualTools("base_link", "bbox_marker");
     visual_toolPtr->deleteAllMarkers();
     delete visual_toolPtr;
     bbox_pub.publish(bbox_markers);
@@ -125,7 +125,7 @@ std:: tuple<visualization_msgs::Marker, visualization_msgs::Marker> BoundingBox_
 BoundingBox_moi::BoundingBox_moi(ros::NodeHandle *n){
     std::cout << "\033[1;32m BoundingBox constructor called.\033[0m" << std::endl;
     // get ros parameters
-    n->param<std::string>("/reference_frame/frame_id",reference_frame,"camera_depth_optical_frame");
+    n->param<std::string>("/reference_frame/frame_id",reference_frame,"velodyne");
     bbox_pub = n->advertise<visualization_msgs::MarkerArray>("bbox_marker", 1);
     clusters_sub = n->subscribe("pcl_clusters", 1, &BoundingBox_moi::clusters_callback, this);
     }
@@ -229,7 +229,7 @@ std:: tuple<visualization_msgs::Marker, visualization_msgs::Marker> BoundingBox_
     BoundingBox_pca::BoundingBox_pca(ros::NodeHandle *n){
     std::cout << "\033[1;32m BoundingBox constructor called.\033[0m" << std::endl;
     // get ros parameters
-    n->param<std::string>("/reference_frame/frame_id",reference_frame,"camera_depth_optical_frame");
+    n->param<std::string>("/reference_frame/frame_id",reference_frame,"velodyne");
     bbox_pub = n->advertise<visualization_msgs::MarkerArray>("bbox_marker", 1);
     clusters_sub = n->subscribe("pcl_clusters", 1, &BoundingBox_pca::clusters_callback, this);
     }

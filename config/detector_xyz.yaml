@@ -2,11 +2,11 @@ pointcloud_topic:
     camera_topic: /velodyne_points
 
 reference_frame:
-    frame_id: velodyne
+    frame_id: base_link
     
 transform:
     roll: 0.0
-    pitch: 0.0
+    pitch: 0.279253
     yaw: 0.0
 
 voxel_grid:
@@ -22,7 +22,7 @@ pass_through:
     y_min: -2.0
     y_max: 2.0
     y_enable: true
-    z_min: -5.0
+    z_min: -1.0
     z_max: 5.0
     z_enable: true
 
