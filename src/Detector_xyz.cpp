@@ -86,11 +86,7 @@ void Detector::pass_through(){
     // PassThrough
     pcl::PassThrough<pcl::PointXYZ> pass;
     pass.setInputCloud (cloud);
-    /* 
-     * x of pcl is z of camera_link
-     * y of pcl is x of camera_link
-     * z of pcl is y of camera_link
-    */
+
     if (x_pass_through_enabled){
         pass.setFilterFieldName ("x");
         pass.setFilterLimits (x_min,x_max);
