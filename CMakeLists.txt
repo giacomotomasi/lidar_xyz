@@ -53,4 +53,7 @@ target_link_libraries(detector_xyz_node ${catkin_LIBRARIES})
 add_executable(bbox_xyz_node src/bbox_xyz_node.cpp src/Bbox_xyz.cpp)
 target_link_libraries(bbox_xyz_node ${catkin_LIBRARIES})
 
+add_executable(lidar_tf_broadcaster src/lidar_tf_broadcaster.cpp)
+target_link_libraries(lidar_tf_broadcaster ${catkin_LIBRARIES})
+
 

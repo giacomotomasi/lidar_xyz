@@ -53,6 +53,10 @@ private:
     int min_cluster_size {};
     int max_cluster_size {};
     bool cluster_extraction_enabled;
+    // transform
+    double roll {};
+    double pitch {};
+    double yaw {};
 public:
     void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg);
     void voxel_grid();

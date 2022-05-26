@@ -35,13 +35,18 @@
 
 void Detector::cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg){
     geometry_msgs::Transform *transform = new geometry_msgs::Transform;
+    tf::Quaternion q;
+    q.setRPY(roll, pitch, yaw);
+    q = q.normalize();
+
     transform->translation.x = 0.0;
     transform->translation.y = 0.0;
-    transform->translation.z = 1.25;
-    transform->rotation.x = 0.0;
-    transform->rotation.y = 0.13917;
-    transform->rotation.z = 0.0;
-    transform->rotation.w = 0.99027;
+    transform->translation.z = 0.0;
+    
+    transform->rotation.x = q.x();
+    transform->rotation.y = q.y();
+    transform->rotation.z = q.z();
+    transform->rotation.w = q.w();
     
     // pcl::PointCloud<pcl::PointXYZ>::Ptr trans_pointcloud = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
     pcl::PointCloud<pcl::PointXYZ>::Ptr trans_pointcloud (new pcl::PointCloud<pcl::PointXYZ>);
@@ -222,6 +227,9 @@ Detector::Detector(ros::NodeHandle *n1){
     n1->param("/cluster_extraction/min_cluster_size",min_cluster_size,1000);
     n1->param("/cluster_extraction/max_cluster_size",max_cluster_size,25000);
     n1->param("/cluster_extraction/enable",cluster_extraction_enabled,true);
+    n1->param("/transform/roll",roll,0.0);
+    n1->param("/transform/pitch",pitch,0.0);
+    n1->param("/transform/yaw",yaw,0.0);
     // Create pointer in the heap
     cloud = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>);
     // Create a ROS subscriber for the input point cloud

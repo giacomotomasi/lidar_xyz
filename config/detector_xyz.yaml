@@ -3,6 +3,11 @@ pointcloud_topic:
 
 reference_frame:
     frame_id: velodyne
+    
+transform:
+    roll: 0.0
+    pitch: 0.0
+    yaw: 0.0
 
 voxel_grid:
     x: 0.01
@@ -12,10 +17,10 @@ voxel_grid:
     
 pass_through:
     x_min: 0.0
-    x_max: 2.0
+    x_max: 3.0
     x_enable: true
-    y_min: -2.5
-    y_max: 2.5
+    y_min: -2.0
+    y_max: 2.0
     y_enable: true
     z_min: -5.0
     z_max: 5.0
@@ -23,18 +28,18 @@ pass_through:
 
 segmentation:
     distance_threshold: 0.01
-    enable: false
+    enable: true
     
 outlier_removal:
     meanK: 50
     standard_dev_mult: 1.0
-    enable: false
+    enable: true
     
 cluster_extraction:
-    cluster_tolerance: 0.1
-    min_cluster_size: 50
-    max_cluster_size: 250
-    enable: false
+    cluster_tolerance: 0.2
+    min_cluster_size: 20
+    max_cluster_size: 500
+    enable: true
     
     
     

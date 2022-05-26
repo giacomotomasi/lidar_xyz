@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+    
+  <rosparam file="$(find lidar_xyz)/config/detector_xyz.yaml" />
+  <param name="/use_sim_time" value="true" />  
+  <node pkg="rosbag" type="play" name="player" output="screen" args="-l --clock /home/giacomo/Desktop/bagfiles/camera_lidar.bag"/>
+  
+  <node name="detector_xyz_node" pkg="lidar_xyz" type="detector_xyz_node" output="screen" />
+  <node name="bbox_xyz_node" pkg="lidar_xyz" type="bbox_xyz_node" output="screen" />
+  <node name="lidar_tf_broadcaster" pkg="lidar_xyz" type="lidar_tf_broadcaster" output="screen" />
+  <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find lidar_xyz)/rviz/lidar_bag.rviz"/>
+  
+</launch>
