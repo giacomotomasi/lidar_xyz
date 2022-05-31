@@ -54,6 +54,9 @@ private:
     int max_cluster_size {};
     bool cluster_extraction_enabled;
     // transform
+    double x {};
+    double y {};
+    double z {};
     double roll {};
     double pitch {};
     double yaw {};

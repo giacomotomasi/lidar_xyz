@@ -6,13 +6,21 @@ int main(int argc, char** argv){
 
     ros::NodeHandle node;
     ros::Rate rate(150);
+    double x {}, y {}, z {}, roll {}, pitch {}, yaw {};
+    
+    node.param("/transform/position/x",x,0.0);
+    node.param("/transform/position/y",y,0.0);
+    node.param("/transform/position/z",z,0.0);
+    node.param("/transform/orientation/roll",roll,0.0);
+    node.param("/transform/orientation/pitch",pitch,0.0);
+    node.param("/transform/orientation/yaw",yaw,0.0);
     
     while (node.ok()){
         static tf::TransformBroadcaster br;
         tf::Transform transform;
-        transform.setOrigin( tf::Vector3(0.0, 0.0, 1.25) );
+        transform.setOrigin( tf::Vector3(x, y, z) );
         tf::Quaternion q;
-        q.setRPY(0, 0.279253, 0);
+        q.setRPY(roll, pitch, yaw);
         transform.setRotation(q);
         br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "base_link", "velodyne"));
         rate.sleep();
