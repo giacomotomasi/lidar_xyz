@@ -18,17 +18,19 @@
 // Markers
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
+#include<lidar_xyz/BoundingBox3D.h>
 
 class BoundingBox_moi {
     private:
     ros::Publisher bbox_pub;
+    ros::Publisher bbox_markers_pub;
     ros::Subscriber clusters_sub;
     // reference frame
     std::string reference_frame;
 public:
     void clusters_callback(const lidar_xyz::ClustersArray::ConstPtr& clusters_msg);
     // function to find BBOX
-    std:: tuple<visualization_msgs::Marker, visualization_msgs::Marker> getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j);
+    void getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j, visualization_msgs::Marker &marker, visualization_msgs::Marker &text_marker, lidar_xyz::BoundingBox3D &bbox);
     // Constructor
     BoundingBox_moi(ros::NodeHandle *n);
     // Destructor
@@ -39,13 +41,14 @@ public:
 class BoundingBox_pca {
 private:
     ros::Publisher bbox_pub;
+    ros::Publisher bbox_markers_pub;
     ros::Subscriber clusters_sub;
     // reference frame
     std::string reference_frame;
 public:
     void clusters_callback(const lidar_xyz::ClustersArray::ConstPtr& clusters_msg);
     // function to find BBOX
-    std:: tuple<visualization_msgs::Marker, visualization_msgs::Marker> getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j);
+    void getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j, visualization_msgs::Marker &marker, visualization_msgs::Marker &text_marker, lidar_xyz::BoundingBox3D &bbox);
     // Constructor
     BoundingBox_pca(ros::NodeHandle *n);
     // Destructor

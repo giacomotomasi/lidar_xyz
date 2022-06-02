@@ -9,6 +9,8 @@
 
 #include<ros/ros.h>
 #include<lidar_xyz/ClustersArray.h>
+#include<lidar_xyz/BoundingBox3DArray.h>
+#include<lidar_xyz/BoundingBox3D.h>
 #include<sensor_msgs/PointCloud2.h>
 // PCL specific includes
 #include <pcl_conversions/pcl_conversions.h>
@@ -30,25 +32,27 @@
 
 void BoundingBox_moi::clusters_callback(const lidar_xyz::ClustersArray::ConstPtr& clusters_msg){
     visualization_msgs::MarkerArray::Ptr bbox_markers (new visualization_msgs::MarkerArray);
+    lidar_xyz::BoundingBox3DArray bbox_array;
     //std::cout << (*clusters_msg).clusters.size() << std::endl;
     for (int i {0};i<(*clusters_msg).clusters.size();i++){
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
-        // convert cloud to pcl::PointXYZRGB
+        // convert cloud to pcl::PointXYZ
         pcl::fromROSMsg((*clusters_msg).clusters.at(i), *cloud);
         visualization_msgs::Marker marker, text_marker;
-        tie(marker, text_marker) = getBBox(cloud, i);
+        lidar_xyz::BoundingBox3D bbox;
+        BoundingBox_moi::getBBox(cloud, i, marker, text_marker, bbox);
         (*bbox_markers).markers.push_back(marker);
         (*bbox_markers).markers.push_back(text_marker);
+        bbox_array.bboxes.push_back(bbox);
         }
-    rviz_visual_tools::RvizVisualTools *visual_toolPtr = new rviz_visual_tools::RvizVisualTools("base_link", "bbox_marker");
-    visual_toolPtr->deleteAllMarkers();
-    delete visual_toolPtr;
-    bbox_pub.publish(bbox_markers);
+    bbox_markers_pub.publish(bbox_markers);
+    bbox_pub.publish(bbox_array);
+    (*bbox_markers).markers.clear();
     
 }
 
 // function to find BBOX
-std:: tuple<visualization_msgs::Marker, visualization_msgs::Marker> BoundingBox_moi::getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j){
+void BoundingBox_moi::getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j, visualization_msgs::Marker &marker, visualization_msgs::Marker &text_marker, lidar_xyz::BoundingBox3D &bbox){
 
     pcl::MomentOfInertiaEstimation<pcl::PointXYZ> feature_extractor;
     feature_extractor.setInputCloud(cluster);
@@ -70,7 +74,6 @@ std:: tuple<visualization_msgs::Marker, visualization_msgs::Marker> BoundingBox_
     feature_extractor.getMassCenter(mass_center);
     Eigen::Quaternionf quat(rotational_matrix_OBB);
     // create marker correspoinding to the bbox
-    visualization_msgs::Marker marker;
     marker.header.frame_id = reference_frame;
     marker.ns = "Obstacle";
     marker.header.stamp = ros::Time::now();
@@ -93,7 +96,6 @@ std:: tuple<visualization_msgs::Marker, visualization_msgs::Marker> BoundingBox_
     marker.color.g = 0.0;
     marker.color.b = 0;    
     // create TEXT marker
-    visualization_msgs::Marker text_marker;
     text_marker.header.frame_id = reference_frame;
     std::stringstream obs;
     obs << "Obstacle " << j;
@@ -117,8 +119,10 @@ std:: tuple<visualization_msgs::Marker, visualization_msgs::Marker> BoundingBox_
     text_marker.color.a = 1.0;
     text_marker.color.r = 1.0;
     text_marker.color.g = 0.0;
-    text_marker.color.b = 0;
-    return {marker, text_marker};
+    text_marker.color.b = 0;    
+    // BoundingBox msg
+    bbox.center = marker.pose;
+    bbox.size = marker.scale;
     }
     
 // Constructor
@@ -126,7 +130,8 @@ BoundingBox_moi::BoundingBox_moi(ros::NodeHandle *n){
     std::cout << "\033[1;32m BoundingBox constructor called.\033[0m" << std::endl;
     // get ros parameters
     n->param<std::string>("/reference_frame/frame_id",reference_frame,"velodyne");
-    bbox_pub = n->advertise<visualization_msgs::MarkerArray>("bbox_marker", 1);
+    bbox_pub = n->advertise<lidar_xyz::BoundingBox3DArray>("boundingBoxArray", 1);
+    bbox_markers_pub = n->advertise<visualization_msgs::MarkerArray>("bbox_marker", 1);
     clusters_sub = n->subscribe("pcl_clusters", 1, &BoundingBox_moi::clusters_callback, this);
     }
     
@@ -139,21 +144,26 @@ BoundingBox_moi::~BoundingBox_moi(){
     
 void BoundingBox_pca::clusters_callback(const lidar_xyz::ClustersArray::ConstPtr& clusters_msg){
     visualization_msgs::MarkerArray::Ptr bbox_markers (new visualization_msgs::MarkerArray);
+    lidar_xyz::BoundingBox3DArray bbox_array;
     //std::cout << (*clusters_msg).clusters.size() << std::endl;
     for (int i {0};i<(*clusters_msg).clusters.size();i++){
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
-        // convert cloud to pcl::PointXYZRGB
+        // convert cloud to pcl::PointXYZ
         pcl::fromROSMsg((*clusters_msg).clusters.at(i), *cloud);
         visualization_msgs::Marker marker, text_marker;
-        tie(marker, text_marker) = getBBox(cloud, i);
+        lidar_xyz::BoundingBox3D bbox;
+        BoundingBox_pca::getBBox(cloud, i, marker, text_marker, bbox);
         (*bbox_markers).markers.push_back(marker);
         (*bbox_markers).markers.push_back(text_marker);
+        bbox_array.bboxes.push_back(bbox);
         }
-    bbox_pub.publish(bbox_markers);
+    bbox_markers_pub.publish(bbox_markers);
+    bbox_pub.publish(bbox_array);
+    (*bbox_markers).markers.clear();
 }
 
 // function to find BBOX
-std:: tuple<visualization_msgs::Marker, visualization_msgs::Marker> BoundingBox_pca::getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j){
+void BoundingBox_pca::getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j, visualization_msgs::Marker &marker, visualization_msgs::Marker &text_marker, lidar_xyz::BoundingBox3D &bbox){
 
     pcl::PointCloud<pcl::PointXYZ>::Ptr projected_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::PCA<pcl::PointXYZ> pca;
@@ -171,7 +181,6 @@ std:: tuple<visualization_msgs::Marker, visualization_msgs::Marker> BoundingBox_
     tf::matrixEigenToTF(eigen_vector_pca_double, tf_rotation);
     tf_rotation.getRotation(quat);
     // create marker correspoinding to the bbox
-    visualization_msgs::Marker marker;
     marker.header.frame_id = reference_frame;
     marker.ns = "Obstacle";
     marker.header.stamp = ros::Time::now();
@@ -194,7 +203,6 @@ std:: tuple<visualization_msgs::Marker, visualization_msgs::Marker> BoundingBox_
     marker.color.g = 0.0;
     marker.color.b = 0;
     // create TEXT marker
-    visualization_msgs::Marker text_marker;
     text_marker.header.frame_id = reference_frame;
     std::stringstream obs;
     obs << "Obstacle " << j;
@@ -222,7 +230,9 @@ std:: tuple<visualization_msgs::Marker, visualization_msgs::Marker> BoundingBox_
     text_marker.color.r = 1.0;
     text_marker.color.g = 0.0;
     text_marker.color.b = 0;
-    return {marker, text_marker};
+    // BoundingBox msg
+    bbox.center = marker.pose;
+    bbox.size = marker.scale;
     }
     
     // Constructor
@@ -230,7 +240,8 @@ std:: tuple<visualization_msgs::Marker, visualization_msgs::Marker> BoundingBox_
     std::cout << "\033[1;32m BoundingBox constructor called.\033[0m" << std::endl;
     // get ros parameters
     n->param<std::string>("/reference_frame/frame_id",reference_frame,"velodyne");
-    bbox_pub = n->advertise<visualization_msgs::MarkerArray>("bbox_marker", 1);
+    bbox_pub = n->advertise<lidar_xyz::BoundingBox3DArray>("boundingBoxArray", 1);
+    bbox_markers_pub = n->advertise<visualization_msgs::MarkerArray>("bbox_marker", 1);
     clusters_sub = n->subscribe("pcl_clusters", 1, &BoundingBox_pca::clusters_callback, this);
     }
     
