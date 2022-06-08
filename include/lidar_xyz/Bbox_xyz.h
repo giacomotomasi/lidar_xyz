@@ -2,7 +2,7 @@
  * Project: Object detection                    
  * Author: Giacomo Tomasi              
  * E-Mail: giacomo.tomasi@unibz.it         
- * Date: April 2021                        
+ * Date: April 2022                        
  * File: Bbox.h                          */
 
 #ifndef _DETECTOR_H_
