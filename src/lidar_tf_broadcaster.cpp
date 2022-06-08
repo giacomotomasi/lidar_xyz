@@ -1,3 +1,10 @@
+/*
+ * Project: Object detection                    
+ * Author: Giacomo Tomasi              
+ * E-Mail: giacomo.tomasi@unibz.it         
+ * Date: April 2022                        
+ * File: lidar_tf_broadcaster.cpp                          */
+ 
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
 

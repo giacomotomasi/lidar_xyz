@@ -2,7 +2,7 @@
  * Project: Object detection                    
  * Author: Giacomo Tomasi              
  * E-Mail: giacomo.tomasi@unibz.it         
- * Date: April 2021                        
+ * Date: April 2022                        
  * File: Bboxlidar_xyz.cpp                          */
 
 #include<iostream>
