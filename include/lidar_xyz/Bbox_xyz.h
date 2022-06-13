@@ -27,6 +27,8 @@ class BoundingBox_moi {
     ros::Subscriber clusters_sub;
     // reference frame
     std::string reference_frame;
+    bool oriented;
+    double offset;
 public:
     void clusters_callback(const lidar_xyz::ClustersArray::ConstPtr& clusters_msg);
     // function to find BBOX

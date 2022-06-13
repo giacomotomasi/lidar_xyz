@@ -61,13 +61,17 @@ void BoundingBox_moi::getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j
     std::vector<float> eccentricity;
     pcl::PointXYZ min_point_OBB;
     pcl::PointXYZ max_point_OBB;
+    pcl::PointXYZ min_point_AABB;
+    pcl::PointXYZ max_point_AABB;
     pcl::PointXYZ position_OBB;
     Eigen::Matrix3f rotational_matrix_OBB;
+    //Eigen::Matrix3f rotational_matrix_OBB.eulerAngles(0, 0, yaw);
     float major_value, middle_value, minor_value;
     Eigen::Vector3f major_vector, middle_vector, minor_vector;
     Eigen::Vector3f mass_center;
     feature_extractor.getMomentOfInertia(moment_of_inertia);
     feature_extractor.getEccentricity(eccentricity);
+    feature_extractor.getAABB(min_point_AABB, max_point_AABB);
     feature_extractor.getOBB(min_point_OBB, max_point_OBB, position_OBB, rotational_matrix_OBB);
     feature_extractor.getEigenValues(major_value, middle_value, minor_value);
     feature_extractor.getEigenVectors(major_vector, middle_vector, minor_vector);
@@ -84,13 +88,36 @@ void BoundingBox_moi::getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j
     marker.pose.position.x = position_OBB.x;
     marker.pose.position.y = position_OBB.y;
     marker.pose.position.z = position_OBB.z;
-    marker.pose.orientation.x = quat.x();
-    marker.pose.orientation.y = quat.y();
-    marker.pose.orientation.z = quat.z();
-    marker.pose.orientation.w = quat.w();
-    marker.scale.x = max_point_OBB.x - min_point_OBB.x + 0.02;
-    marker.scale.y = max_point_OBB.y - min_point_OBB.y + 0.02;
-    marker.scale.z = max_point_OBB.z - min_point_OBB.z + 0.02;
+    if (oriented){
+        marker.scale.x = max_point_OBB.x - min_point_OBB.x + offset;
+        marker.scale.y = max_point_OBB.y - min_point_OBB.y + offset;
+        marker.scale.z = max_point_OBB.z - min_point_OBB.z + offset;
+        marker.pose.orientation.x = quat.x();
+        marker.pose.orientation.y = quat.y();
+        marker.pose.orientation.z = quat.z();
+        marker.pose.orientation.w = quat.w();
+        // BoundingBox msg
+        bbox.center = marker.pose;
+        //bbox.size = marker.scale;
+        bbox.size.x = max_point_OBB.x - min_point_OBB.x;
+        bbox.size.y = max_point_OBB.y - min_point_OBB.y;
+        bbox.size.z = max_point_OBB.z - min_point_OBB.z;
+        } else {
+            marker.scale.x = max_point_AABB.x - min_point_AABB.x + offset;
+            marker.scale.y = max_point_AABB.y - min_point_AABB.y + offset;
+            marker.scale.z = max_point_AABB.z - min_point_AABB.z + offset;
+            marker.pose.orientation.x = 0;
+            marker.pose.orientation.y = 0;
+            marker.pose.orientation.z = 0;
+            marker.pose.orientation.w = 1;
+            // BoundingBox msg
+            bbox.center = marker.pose;
+            //bbox.size = marker.scale;
+            bbox.size.x = max_point_AABB.x - min_point_AABB.x;
+            bbox.size.y = max_point_AABB.y - min_point_AABB.y;
+            bbox.size.z = max_point_AABB.z - min_point_AABB.z;
+            }
+
     marker.color.a = 0.15;
     marker.color.r = 1.0;
     marker.color.g = 0.0;
@@ -120,9 +147,7 @@ void BoundingBox_moi::getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j
     text_marker.color.r = 1.0;
     text_marker.color.g = 0.0;
     text_marker.color.b = 0;    
-    // BoundingBox msg
-    bbox.center = marker.pose;
-    bbox.size = marker.scale;
+    
     }
     
 // Constructor
@@ -130,6 +155,8 @@ BoundingBox_moi::BoundingBox_moi(ros::NodeHandle *n){
     std::cout << "\033[1;32m BoundingBox constructor called.\033[0m" << std::endl;
     // get ros parameters
     n->param<std::string>("/reference_frame/frame_id",reference_frame,"velodyne");
+    n->param("/boundingbox/oriented",oriented,false);
+    n->param("/boundingbox/offset",offset,0.02);
     bbox_pub = n->advertise<lidar_xyz::BoundingBox3DArray>("boundingBoxArray", 1);
     bbox_markers_pub = n->advertise<visualization_msgs::MarkerArray>("bbox_marker", 1);
     clusters_sub = n->subscribe("pcl_clusters", 1, &BoundingBox_moi::clusters_callback, this);

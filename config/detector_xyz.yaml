@@ -46,6 +46,10 @@ cluster_extraction:
     max_cluster_size: 500
     enable: true
     
+boundingbox:
+    offset: 0.2
+    oriented: false
+    
     
     
 
