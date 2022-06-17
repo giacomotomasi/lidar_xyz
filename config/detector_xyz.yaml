@@ -2,7 +2,7 @@ pointcloud_topic:
     camera_topic: /velodyne_points
 
 reference_frame:
-    frame_id: base_link
+    frame_id: base_footprint
     
 transform:
     position:
@@ -49,6 +49,9 @@ cluster_extraction:
 boundingbox:
     offset: 0.2
     oriented: false
+    
+map:
+    safety: 0 #define if cells or 0.1 meters
     
     
     

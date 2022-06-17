@@ -191,7 +191,7 @@ void Detector::publish(){
     // reconvert to PointCloud2 to be ROS compatible
     pcl::PCLPointCloud2::Ptr cloud_ros (new pcl::PCLPointCloud2());
     pcl::toPCLPointCloud2(*cloud, *cloud_ros);
-    cloud_ros->header.frame_id = "base_link";
+    cloud_ros->header.frame_id = reference_frame;
     cloud_pub.publish(cloud_ros);
     //std::cout << "Point Cloud width: %d " << cloud->width << std::endl;
     }
@@ -200,9 +200,8 @@ void Detector::publish(){
 Detector::Detector(ros::NodeHandle *n1){
     std::cout << "\033[1;32m Detector constructor called.\033[0m" << std::endl; // print in green color
     // get ros parameters
-    n1->param<std::string>("/pointcloud_topic/camera_topic",pointcloud_topic,"/camera/depth/color/points");
-    std::cout << "topic name " << pointcloud_topic << std::endl;
-    n1->param<std::string>("/reference_frame/frame_id",reference_frame,"camera_depth_optical_frame");
+    n1->param<std::string>("/pointcloud_topic/camera_topic",pointcloud_topic,"/velodyne/points");
+    n1->param<std::string>("/reference_frame/frame_id",reference_frame,"base_link");
     n1->param("/voxel_grid/x",size_x,0.05);
     n1->param("/voxel_grid/y",size_y,0.05);
     n1->param("/voxel_grid/z",size_z,0.05);

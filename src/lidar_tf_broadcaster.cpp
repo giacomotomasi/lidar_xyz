@@ -14,6 +14,7 @@ int main(int argc, char** argv){
     ros::NodeHandle node;
     ros::Rate rate(150);
     double x {}, y {}, z {}, roll {}, pitch {}, yaw {};
+    std::string frame;
     
     node.param("/transform/position/x",x,0.0);
     node.param("/transform/position/y",y,0.0);
@@ -21,6 +22,7 @@ int main(int argc, char** argv){
     node.param("/transform/orientation/roll",roll,0.0);
     node.param("/transform/orientation/pitch",pitch,0.0);
     node.param("/transform/orientation/yaw",yaw,0.0);
+    node.param<std::string>("/reference_frame/frame_id",frame,"base_base");
     
     while (node.ok()){
         static tf::TransformBroadcaster br;
@@ -29,7 +31,7 @@ int main(int argc, char** argv){
         tf::Quaternion q;
         q.setRPY(roll, pitch, yaw);
         transform.setRotation(q);
-        br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "base_link", "velodyne"));
+        br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), frame, "velodyne"));
         rate.sleep();
         }
     
