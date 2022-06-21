@@ -34,19 +34,19 @@
 
 
 void Detector::cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg){
-    geometry_msgs::Transform *transform = new geometry_msgs::Transform;
+    geometry_msgs::Transform transform;
     tf::Quaternion q;
     q.setRPY(roll, pitch, yaw);
     q = q.normalize();
 
-    transform->translation.x = x;
-    transform->translation.y = y;
-    transform->translation.z = z;
+    transform.translation.x = x;
+    transform.translation.y = y;
+    transform.translation.z = z;
     
-    transform->rotation.x = q.x();
-    transform->rotation.y = q.y();
-    transform->rotation.z = q.z();
-    transform->rotation.w = q.w();
+    transform.rotation.x = q.x();
+    transform.rotation.y = q.y();
+    transform.rotation.z = q.z();
+    transform.rotation.w = q.w();
     
     // pcl::PointCloud<pcl::PointXYZ>::Ptr trans_pointcloud = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
     pcl::PointCloud<pcl::PointXYZ>::Ptr trans_pointcloud (new pcl::PointCloud<pcl::PointXYZ>);
@@ -55,7 +55,7 @@ void Detector::cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     pcl::fromROSMsg (*cloud_msg, *trans_pointcloud);
     //trans_pointcloud->header.frame_id = "base_link";
     
-    pcl_ros::transformPointCloud(*trans_pointcloud, *cloud, *transform);
+    pcl_ros::transformPointCloud(*trans_pointcloud, *cloud, transform);
     
     if (voxel_grid_enabled)
         Detector::voxel_grid();
@@ -71,10 +71,13 @@ void Detector::cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
         Detector::outlier_removal();
     
     Detector::publish();
-    delete transform;
     }
     
 void Detector::voxel_grid(){
+    if (cloud->size() == 0){
+        std::cout << "Empty PointCloud, skipping this step!" << std::endl;
+        return;
+    }
     // VoxelGrid
     pcl::VoxelGrid<pcl::PointXYZ> voxel_grid;
     voxel_grid.setInputCloud (cloud);
@@ -83,6 +86,10 @@ void Detector::voxel_grid(){
     }
 
 void Detector::pass_through(){
+    if (cloud->size() == 0){
+        std::cout << "Empty PointCloud, skipping this step!" << std::endl;
+        return;
+    }
     // PassThrough
     pcl::PassThrough<pcl::PointXYZ> pass;
     pass.setInputCloud (cloud);
@@ -105,6 +112,10 @@ void Detector::pass_through(){
     }
 
 void Detector::segmentation(){
+    if (cloud->size() == 0){
+        std::cout << "Empty PointCloud, skipping this step!" << std::endl;
+        return;
+    }
     // Segmentation
     pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
     pcl::PointIndices::Ptr indices (new pcl::PointIndices);
@@ -126,6 +137,10 @@ void Detector::segmentation(){
     }
   
 void Detector::extract_indices(pcl::PointIndices::Ptr indices, bool mode){
+    if (cloud->size() == 0){
+        std::cout << "Empty PointCloud, skipping this step!" << std::endl;
+        return;
+    }
     // Create the filtering object
     pcl::ExtractIndices<pcl::PointXYZ> extract;
     extract.setInputCloud(cloud);
@@ -135,6 +150,10 @@ void Detector::extract_indices(pcl::PointIndices::Ptr indices, bool mode){
     }
     
 void Detector::outlier_removal(){
+    if (cloud->size() == 0){
+        std::cout << "Empty PointCloud, skipping this step!" << std::endl;
+        return;
+    }
     // Outlier removal
     pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
     sor.setInputCloud(cloud);
@@ -144,6 +163,10 @@ void Detector::outlier_removal(){
     }
     
 void Detector::cluster_extraction(){
+    if (cloud->size() == 0){
+        std::cout << "Empty PointCloud, skipping this step!" << std::endl;
+        return;
+    }
     // Creating the KdTree object for the search method of the extraction
     pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
     tree->setInputCloud(cloud);

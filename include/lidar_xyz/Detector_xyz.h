@@ -15,6 +15,7 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
+#include<nav_msgs/Odometry.h>
 
 class Detector {
 private:
@@ -60,7 +61,14 @@ private:
     double roll {};
     double pitch {};
     double yaw {};
+    double robot_x {};
+    double robot_y {};
+    double robot_qx {};
+    double robot_qy {};
+    double robot_qz {};
+    double robot_qw {};
 public:
+    void odom_callback(const nav_msgs::Odometry::ConstPtr &odom_msg);
     void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg);
     void voxel_grid();
     void pass_through();

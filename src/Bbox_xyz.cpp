@@ -41,14 +41,23 @@ void BoundingBox_moi::clusters_callback(const lidar_xyz::ClustersArray::ConstPtr
         visualization_msgs::Marker marker, text_marker;
         lidar_xyz::BoundingBox3D bbox;
         BoundingBox_moi::getBBox(cloud, i, marker, text_marker, bbox);
-        (*bbox_markers).markers.push_back(marker);
-        (*bbox_markers).markers.push_back(text_marker);
+        bbox_markers->markers.push_back(marker);
+        bbox_markers->markers.push_back(text_marker);
         bbox_array.bboxes.push_back(bbox);
         }
+    // delete all markers
+    visualization_msgs::MarkerArray::Ptr delete_markers (new visualization_msgs::MarkerArray);
+    visualization_msgs::Marker del_marker;
+    del_marker.header.frame_id = reference_frame;    
+    del_marker.action = visualization_msgs::Marker::DELETEALL;
+    delete_markers->markers.push_back(del_marker);
+    bbox_markers_pub.publish(delete_markers);
+
+//    rviz_visual_tools::RvizVisualTools rviz_interface(reference_frame,"/bbox_marker");
+//    rviz_interface.deleteAllMarkers();
+    // publish markers
     bbox_markers_pub.publish(bbox_markers);
     bbox_pub.publish(bbox_array);
-    (*bbox_markers).markers.clear();
-    
 }
 
 // function to find BBOX

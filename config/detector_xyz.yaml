@@ -6,7 +6,7 @@ reference_frame:
     
 transform:
     position:
-        x: 0.0
+        x: -0.3
         y: 0.0
         z: 1.45
     orientation:
@@ -49,10 +49,3 @@ cluster_extraction:
 boundingbox:
     offset: 0.2
     oriented: false
-    
-map:
-    safety: 0 #define if cells or 0.1 meters
-    
-    
-    
-

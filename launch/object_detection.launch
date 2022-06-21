@@ -6,5 +6,6 @@
     <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find lidar_xyz)/rviz/sim_bbox.rviz"/>
     <node name="detector_xyz_node" pkg="lidar_xyz" type="detector_xyz_node" output="screen" />
     <node name="bbox_xyz_node" pkg="lidar_xyz" type="bbox_xyz_node" output="screen" />
+    <node name="lidar_tf_broadcaster" pkg="lidar_xyz" type="lidar_tf_broadcaster" output="screen" />
 
 </launch> 
