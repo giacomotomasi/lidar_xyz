@@ -31,31 +31,34 @@
 
 #include <tf2_eigen/tf2_eigen.h>
 #include <pcl_ros/transforms.h>
+#include <tf/transform_listener.h>
 
 
 void Detector::cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg){
     geometry_msgs::Transform transform;
-    tf::Quaternion q;
-    q.setRPY(roll, pitch, yaw);
-    q = q.normalize();
-
-    transform.translation.x = x;
-    transform.translation.y = y;
-    transform.translation.z = z;
+//    tf::Quaternion q;
+//    q.setRPY(roll, pitch, yaw);
+//    q = q.normalize();
+//
+//    transform.translation.x = x;
+//    transform.translation.y = y;
+//    transform.translation.z = z;
+//    
+//    transform.rotation.x = q.x();
+//    transform.rotation.y = q.y();
+//    transform.rotation.z = q.z();
+//    transform.rotation.w = q.w();
     
-    transform.rotation.x = q.x();
-    transform.rotation.y = q.y();
-    transform.rotation.z = q.z();
-    transform.rotation.w = q.w();
+    //tf_listener.lookupTransform("odom", "velodyne", ros::Time(0), transform);
     
-    // pcl::PointCloud<pcl::PointXYZ>::Ptr trans_pointcloud = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
     pcl::PointCloud<pcl::PointXYZ>::Ptr trans_pointcloud (new pcl::PointCloud<pcl::PointXYZ>);
     
     // convert cloud to pcl::PointXYZRGB
     pcl::fromROSMsg (*cloud_msg, *trans_pointcloud);
-    //trans_pointcloud->header.frame_id = "base_link";
     
-    pcl_ros::transformPointCloud(*trans_pointcloud, *cloud, transform);
+    //pcl_ros::transformPointCloud(*trans_pointcloud, *cloud, transform);
+    pcl_ros::transformPointCloud("map",*trans_pointcloud, *cloud, tf_listener);
+    
     
     if (voxel_grid_enabled)
         Detector::voxel_grid();

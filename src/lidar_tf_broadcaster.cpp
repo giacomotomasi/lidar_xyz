@@ -12,7 +12,7 @@ int main(int argc, char** argv){
     ros::init(argc, argv, "lidar_tf_broadcaster");
 
     ros::NodeHandle node;
-    ros::Rate rate(150);
+    ros::Rate rate(100);
     double x {}, y {}, z {}, roll {}, pitch {}, yaw {};
     std::string frame;
     
@@ -22,7 +22,7 @@ int main(int argc, char** argv){
     node.param("/transform/orientation/roll",roll,0.0);
     node.param("/transform/orientation/pitch",pitch,0.0);
     node.param("/transform/orientation/yaw",yaw,0.0);
-    node.param<std::string>("/reference_frame/frame_id",frame,"base_base");
+    node.param<std::string>("/reference_frame/frame_id",frame,"base_link");
     
     while (node.ok()){
         static tf::TransformBroadcaster br;

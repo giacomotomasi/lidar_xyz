@@ -16,6 +16,7 @@
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
 #include<nav_msgs/Odometry.h>
+#include <tf/transform_listener.h>
 
 class Detector {
 private:
@@ -23,6 +24,7 @@ private:
     ros::Publisher clusters_pub;
     ros::Subscriber cloud_sub;
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud;
+    tf::TransformListener tf_listener;
     // pointcloud camera topic
     std::string pointcloud_topic;
     // reference frame
