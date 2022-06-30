@@ -25,7 +25,7 @@ voxel_grid:
     
 pass_through:
     x_min: -2.0
-    x_max: 2.0
+    x_max: 3.0
     x_enable: true
     y_min: -2.0
     y_max: 2.0
@@ -36,18 +36,18 @@ pass_through:
 
 segmentation:
     distance_threshold: 0.01
-    enable: true
+    enable: false
     
 outlier_removal:
     meanK: 50
     standard_dev_mult: 1.0
-    enable: true
+    enable: false
     
 cluster_extraction:
     cluster_tolerance: 0.2
     min_cluster_size: 20
     max_cluster_size: 500
-    enable: true
+    enable: false
     
 boundingbox:
     offset: 0.2
