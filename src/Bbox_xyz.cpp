@@ -68,9 +68,9 @@ void BoundingBox_moi::getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j
     tf::Transform transform;
     tf::StampedTransform transformStamped;
     // wait for transform
-    tf_listener.waitForTransform("map", "velodyne", ros::Time(0), ros::Duration(10.0));
+    tf_listener.waitForTransform("map", cluster->header.frame_id, ros::Time(0), ros::Duration(10.0));
     // get transform
-    tf_listener.lookupTransform("map", "velodyne", ros::Time(0), transformStamped);
+    tf_listener.lookupTransform("map", cluster->header.frame_id, ros::Time(0), transformStamped);
     transform.setOrigin(transformStamped.getOrigin());
     transform.setRotation(transformStamped.getRotation());
     pcl::PointCloud<pcl::PointXYZ>::Ptr map_cluster (new pcl::PointCloud<pcl::PointXYZ>);
