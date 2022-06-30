@@ -35,7 +35,7 @@
 void BoundingBox_moi::clusters_callback(const lidar_xyz::ClustersArray::ConstPtr& clusters_msg){
     visualization_msgs::MarkerArray::Ptr bbox_markers (new visualization_msgs::MarkerArray);
     lidar_xyz::BoundingBox3DArray bbox_array;
-    std::cout << (*clusters_msg).clusters.size() << std::endl;
+    //std::cout << (*clusters_msg).clusters.size() << std::endl;
     for (int i {0};i<(*clusters_msg).clusters.size();i++){
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
         // convert cloud to pcl::PointXYZ

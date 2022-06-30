@@ -27,10 +27,10 @@ pass_through:
     x_min: -2.0
     x_max: 2.0
     x_enable: true
-    y_min: -3.0
-    y_max: 3.0
+    y_min: -2.0
+    y_max: 2.0
     y_enable: true
-    z_min: -1.0
+    z_min: 0.0
     z_max: 3.0
     z_enable: true
 
