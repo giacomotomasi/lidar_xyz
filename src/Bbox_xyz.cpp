@@ -19,6 +19,7 @@
 #include <pcl/features/moment_of_inertia_estimation.h>
 #include <pcl/common/pca.h>
 #include <pcl/common/common.h>
+#include <pcl_ros/transforms.h>
 // Markers
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
@@ -28,12 +29,13 @@
 #include <rviz_visual_tools/rviz_visual_tools.h>
 
 #include "lidar_xyz/Bbox_xyz.h"
+#include <tf/transform_listener.h>
 
 
 void BoundingBox_moi::clusters_callback(const lidar_xyz::ClustersArray::ConstPtr& clusters_msg){
     visualization_msgs::MarkerArray::Ptr bbox_markers (new visualization_msgs::MarkerArray);
     lidar_xyz::BoundingBox3DArray bbox_array;
-    //std::cout << (*clusters_msg).clusters.size() << std::endl;
+    std::cout << (*clusters_msg).clusters.size() << std::endl;
     for (int i {0};i<(*clusters_msg).clusters.size();i++){
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
         // convert cloud to pcl::PointXYZ
@@ -62,9 +64,21 @@ void BoundingBox_moi::clusters_callback(const lidar_xyz::ClustersArray::ConstPtr
 
 // function to find BBOX
 void BoundingBox_moi::getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j, visualization_msgs::Marker &marker, visualization_msgs::Marker &text_marker, lidar_xyz::BoundingBox3D &bbox){
-
+    
+    tf::Transform transform;
+    tf::StampedTransform transformStamped;
+    // wait for transform
+    tf_listener.waitForTransform("map", "velodyne", ros::Time(0), ros::Duration(10.0));
+    // get transform
+    tf_listener.lookupTransform("map", "velodyne", ros::Time(0), transformStamped);
+    transform.setOrigin(transformStamped.getOrigin());
+    transform.setRotation(transformStamped.getRotation());
+    pcl::PointCloud<pcl::PointXYZ>::Ptr map_cluster (new pcl::PointCloud<pcl::PointXYZ>);
+    pcl_ros::transformPointCloud(*cluster, *map_cluster, transform);
+    //std::cout << "\033[1;32m map cluster size \033[0m " << map_cluster->size() << std::endl;
+    
     pcl::MomentOfInertiaEstimation<pcl::PointXYZ> feature_extractor;
-    feature_extractor.setInputCloud(cluster);
+    feature_extractor.setInputCloud(map_cluster);
     feature_extractor.compute();
     std::vector<float> moment_of_inertia;
     std::vector<float> eccentricity;
@@ -87,7 +101,7 @@ void BoundingBox_moi::getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j
     feature_extractor.getMassCenter(mass_center);
     Eigen::Quaternionf quat(rotational_matrix_OBB);
     // create marker correspoinding to the bbox
-    marker.header.frame_id = reference_frame;
+    marker.header.frame_id = fixed_frame;
     marker.ns = "Obstacle";
     marker.header.stamp = ros::Time::now();
     marker.id = j;
@@ -132,7 +146,7 @@ void BoundingBox_moi::getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j
     marker.color.g = 0.0;
     marker.color.b = 0;    
     // create TEXT marker
-    text_marker.header.frame_id = reference_frame;
+    text_marker.header.frame_id = fixed_frame;
     std::stringstream obs;
     obs << "Obstacle " << j;
     text_marker.text = obs.str();
@@ -164,6 +178,7 @@ BoundingBox_moi::BoundingBox_moi(ros::NodeHandle *n){
     std::cout << "\033[1;32m BoundingBox constructor called.\033[0m" << std::endl;
     // get ros parameters
     n->param<std::string>("/reference_frame/frame_id",reference_frame,"velodyne");
+    n->param<std::string>("/fixed_frame/frame_id",fixed_frame,"odom");
     n->param("/boundingbox/oriented",oriented,false);
     n->param("/boundingbox/offset",offset,0.02);
     bbox_pub = n->advertise<lidar_xyz::BoundingBox3DArray>("boundingBoxArray", 1);

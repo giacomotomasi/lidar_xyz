@@ -28,37 +28,31 @@
 
 #include <lidar_xyz/ClustersArray.h>
 #include "lidar_xyz/Detector_xyz.h"
+#include<lidar_xyz/BoundingBox3DArray.h>
+#include<nav_msgs/Odometry.h>
 
 #include <tf2_eigen/tf2_eigen.h>
 #include <pcl_ros/transforms.h>
 #include <tf/transform_listener.h>
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Detector::cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg){
-    geometry_msgs::Transform transform;
-//    tf::Quaternion q;
-//    q.setRPY(roll, pitch, yaw);
-//    q = q.normalize();
-//
-//    transform.translation.x = x;
-//    transform.translation.y = y;
-//    transform.translation.z = z;
-//    
-//    transform.rotation.x = q.x();
-//    transform.rotation.y = q.y();
-//    transform.rotation.z = q.z();
-//    transform.rotation.w = q.w();
-    
-    //tf_listener.lookupTransform("odom", "velodyne", ros::Time(0), transform);
+    //geometry_msgs::Transform transform;
+    tf::Transform transform;
+    tf::StampedTransform transformStamped;
+    // wait for transform
+    tf_listener.waitForTransform("base_footprint", "velodyne", cloud_msg->header.stamp, ros::Duration(10.0));
+    // get transform
+    tf_listener.lookupTransform("base_footprint", "velodyne", ros::Time(0), transformStamped);
+    transform.setOrigin(transformStamped.getOrigin());
+    transform.setRotation(transformStamped.getRotation());
     
     pcl::PointCloud<pcl::PointXYZ>::Ptr trans_pointcloud (new pcl::PointCloud<pcl::PointXYZ>);
-    
     // convert cloud to pcl::PointXYZRGB
-    pcl::fromROSMsg (*cloud_msg, *trans_pointcloud);
-    
-    //pcl_ros::transformPointCloud(*trans_pointcloud, *cloud, transform);
-    pcl_ros::transformPointCloud("map",*trans_pointcloud, *cloud, tf_listener);
-    
+    pcl::fromROSMsg(*cloud_msg, *trans_pointcloud);
+    pcl_ros::transformPointCloud(*trans_pointcloud, *cloud, transform);
+    //pcl_ros::transformPointCloud("map",*trans_pointcloud, *cloud, tf_listener);
+
     
     if (voxel_grid_enabled)
         Detector::voxel_grid();
@@ -75,7 +69,8 @@ void Detector::cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     
     Detector::publish();
     }
-    
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
 void Detector::voxel_grid(){
     if (cloud->size() == 0){
         std::cout << "Empty PointCloud, skipping this step!" << std::endl;
@@ -87,7 +82,8 @@ void Detector::voxel_grid(){
     voxel_grid.setLeafSize (size_x,size_y,size_z);
     voxel_grid.filter (*cloud);
     }
-
+    
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Detector::pass_through(){
     if (cloud->size() == 0){
         std::cout << "Empty PointCloud, skipping this step!" << std::endl;
@@ -113,7 +109,8 @@ void Detector::pass_through(){
         pass.filter (*cloud);
         }
     }
-
+    
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Detector::segmentation(){
     if (cloud->size() == 0){
         std::cout << "Empty PointCloud, skipping this step!" << std::endl;
@@ -138,7 +135,8 @@ void Detector::segmentation(){
         Detector::extract_indices(indices, true);
         }
     }
-  
+    
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
 void Detector::extract_indices(pcl::PointIndices::Ptr indices, bool mode){
     if (cloud->size() == 0){
         std::cout << "Empty PointCloud, skipping this step!" << std::endl;
@@ -151,7 +149,7 @@ void Detector::extract_indices(pcl::PointIndices::Ptr indices, bool mode){
     extract.setNegative(mode); // setNegative(true) extract the indices from cloud. setNegative(false) leaves only indices
     extract.filter(*cloud);
     }
-    
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////   
 void Detector::outlier_removal(){
     if (cloud->size() == 0){
         std::cout << "Empty PointCloud, skipping this step!" << std::endl;
@@ -164,7 +162,8 @@ void Detector::outlier_removal(){
     sor.setStddevMulThresh (standard_dev_mult);
     sor.filter(*cloud);
     }
-    
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Detector::cluster_extraction(){
     if (cloud->size() == 0){
         std::cout << "Empty PointCloud, skipping this step!" << std::endl;
@@ -200,9 +199,9 @@ void Detector::cluster_extraction(){
         pcl::PCLPointCloud2::Ptr cloud_ros (new pcl::PCLPointCloud2());
         // convert to pcl::PCLPointCloud2
         pcl::toPCLPointCloud2(*cloud_cluster, *cloud_ros);
-        (*cloud_ros).header.frame_id = reference_frame;
+        cloud_ros->header.frame_id = reference_frame;
         ros::Time time_st = ros::Time::now ();
-        (*cloud_ros).header.stamp = time_st.toNSec()/1e3;
+        cloud_ros->header.stamp = time_st.toNSec()/1e3;
         sensor_msgs::PointCloud2 output;
         // Convert to ROS data type
         pcl_conversions::fromPCL(*cloud_ros, output);
@@ -212,7 +211,8 @@ void Detector::cluster_extraction(){
         Detector::extract_indices(indices, false);
         clusters_pub.publish(clusters_array);
     }
-    
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
 void Detector::publish(){
     // reconvert to PointCloud2 to be ROS compatible
     pcl::PCLPointCloud2::Ptr cloud_ros (new pcl::PCLPointCloud2());
@@ -228,6 +228,7 @@ Detector::Detector(ros::NodeHandle *n1){
     // get ros parameters
     n1->param<std::string>("/pointcloud_topic/camera_topic",pointcloud_topic,"/velodyne/points");
     n1->param<std::string>("/reference_frame/frame_id",reference_frame,"base_link");
+    n1->param<std::string>("/fixed_frame/frame_id",fixed_frame,"odom");
     n1->param("/voxel_grid/x",size_x,0.05);
     n1->param("/voxel_grid/y",size_y,0.05);
     n1->param("/voxel_grid/z",size_z,0.05);

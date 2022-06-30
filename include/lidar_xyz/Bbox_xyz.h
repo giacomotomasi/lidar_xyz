@@ -20,13 +20,19 @@
 #include <visualization_msgs/MarkerArray.h>
 #include<lidar_xyz/BoundingBox3D.h>
 
+#include <tf2_eigen/tf2_eigen.h>
+#include <pcl_ros/transforms.h>
+#include <tf/transform_listener.h>
+
 class BoundingBox_moi {
     private:
     ros::Publisher bbox_pub;
     ros::Publisher bbox_markers_pub;
     ros::Subscriber clusters_sub;
+    tf::TransformListener tf_listener;
     // reference frame
     std::string reference_frame;
+    std::string fixed_frame;
     bool oriented;
     double offset;
 public:

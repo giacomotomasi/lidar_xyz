@@ -15,6 +15,7 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
+#include<lidar_xyz/BoundingBox3DArray.h>
 #include<nav_msgs/Odometry.h>
 #include <tf/transform_listener.h>
 
@@ -29,6 +30,7 @@ private:
     std::string pointcloud_topic;
     // reference frame
     std::string reference_frame;
+    std::string fixed_frame;
     // voxel grid parameters
     double size_x {};
     double size_y {};
@@ -63,14 +65,7 @@ private:
     double roll {};
     double pitch {};
     double yaw {};
-    double robot_x {};
-    double robot_y {};
-    double robot_qx {};
-    double robot_qy {};
-    double robot_qz {};
-    double robot_qw {};
 public:
-    void odom_callback(const nav_msgs::Odometry::ConstPtr &odom_msg);
     void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg);
     void voxel_grid();
     void pass_through();
