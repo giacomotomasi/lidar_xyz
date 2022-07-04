@@ -45,22 +45,4 @@ public:
     ~BoundingBox_moi();
     };
     
-    
-class BoundingBox_pca {
-private:
-    ros::Publisher bbox_pub;
-    ros::Publisher bbox_markers_pub;
-    ros::Subscriber clusters_sub;
-    // reference frame
-    std::string reference_frame;
-public:
-    void clusters_callback(const lidar_xyz::ClustersArray::ConstPtr& clusters_msg);
-    // function to find BBOX
-    void getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j, visualization_msgs::Marker &marker, visualization_msgs::Marker &text_marker, lidar_xyz::BoundingBox3D &bbox);
-    // Constructor
-    BoundingBox_pca(ros::NodeHandle *n);
-    // Destructor
-    ~BoundingBox_pca();
-};
-
 #endif

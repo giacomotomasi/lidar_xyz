@@ -28,8 +28,8 @@
 
 #include <lidar_xyz/ClustersArray.h>
 #include "lidar_xyz/Detector_xyz.h"
-#include<lidar_xyz/BoundingBox3DArray.h>
-#include<nav_msgs/Odometry.h>
+#include <lidar_xyz/BoundingBox3DArray.h>
+#include <nav_msgs/Odometry.h>
 
 #include <tf2_eigen/tf2_eigen.h>
 #include <pcl_ros/transforms.h>
@@ -52,7 +52,6 @@ void Detector::cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     pcl::fromROSMsg(*cloud_msg, *trans_pointcloud);
     pcl_ros::transformPointCloud(*trans_pointcloud, *cloud, transform);
     //pcl_ros::transformPointCloud("map",*trans_pointcloud, *cloud, tf_listener);
-
     
     if (voxel_grid_enabled)
         Detector::voxel_grid();
@@ -149,6 +148,7 @@ void Detector::extract_indices(pcl::PointIndices::Ptr indices, bool mode){
     extract.setNegative(mode); // setNegative(true) extract the indices from cloud. setNegative(false) leaves only indices
     extract.filter(*cloud);
     }
+    
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////   
 void Detector::outlier_removal(){
     if (cloud->size() == 0){
