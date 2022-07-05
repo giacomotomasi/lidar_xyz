@@ -32,7 +32,7 @@
 #include <tf/transform_listener.h>
 
 
-void BoundingBox_moi::clusters_callback(const lidar_xyz::ClustersArray::ConstPtr& clusters_msg){
+void BoundingBox::clusters_callback(const lidar_xyz::ClustersArray::ConstPtr& clusters_msg){
     visualization_msgs::MarkerArray::Ptr bbox_markers (new visualization_msgs::MarkerArray);
     lidar_xyz::BoundingBox3DArray bbox_array;
     //std::cout << (*clusters_msg).clusters.size() << std::endl;
@@ -42,7 +42,7 @@ void BoundingBox_moi::clusters_callback(const lidar_xyz::ClustersArray::ConstPtr
         pcl::fromROSMsg((*clusters_msg).clusters.at(i), *cloud);
         visualization_msgs::Marker marker, text_marker;
         lidar_xyz::BoundingBox3D bbox;
-        BoundingBox_moi::getBBox(cloud, i, marker, text_marker, bbox);
+        BoundingBox::getBBox(cloud, i, marker, text_marker, bbox);
         bbox_markers->markers.push_back(marker);
         bbox_markers->markers.push_back(text_marker);
         bbox_array.bboxes.push_back(bbox);
@@ -59,7 +59,7 @@ void BoundingBox_moi::clusters_callback(const lidar_xyz::ClustersArray::ConstPtr
 }
 
 // function to find BBOX
-void BoundingBox_moi::getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j, visualization_msgs::Marker &marker, visualization_msgs::Marker &text_marker, lidar_xyz::BoundingBox3D &bbox){
+void BoundingBox::getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j, visualization_msgs::Marker &marker, visualization_msgs::Marker &text_marker, lidar_xyz::BoundingBox3D &bbox){
     
     tf::Transform transform;
     tf::StampedTransform transformStamped;
@@ -170,7 +170,7 @@ void BoundingBox_moi::getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j
     }
     
 // Constructor
-BoundingBox_moi::BoundingBox_moi(ros::NodeHandle *n){
+BoundingBox::BoundingBox(ros::NodeHandle *n){
     std::cout << "\033[1;32m BoundingBox constructor called.\033[0m" << std::endl;
     // get ros parameters
     n->param<std::string>("/reference_frame/frame_id",reference_frame,"velodyne");
@@ -179,10 +179,10 @@ BoundingBox_moi::BoundingBox_moi(ros::NodeHandle *n){
     n->param("/boundingbox/offset",offset,0.02);
     bbox_pub = n->advertise<lidar_xyz::BoundingBox3DArray>("boundingBoxArray", 1);
     bbox_markers_pub = n->advertise<visualization_msgs::MarkerArray>("bbox_marker", 1);
-    clusters_sub = n->subscribe("pcl_clusters", 1, &BoundingBox_moi::clusters_callback, this);
+    clusters_sub = n->subscribe("pcl_clusters", 1, &BoundingBox::clusters_callback, this);
     }
     
 // Destructor
-BoundingBox_moi::~BoundingBox_moi(){
+BoundingBox::~BoundingBox(){
     std::cout << "\033[1;32m BoundingBox destructor called.\033[0m" << std::endl; 
     };

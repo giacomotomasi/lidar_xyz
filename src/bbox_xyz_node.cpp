@@ -15,7 +15,7 @@ int main(int argc, char** argv){
     
     ros::NodeHandle n;
     // Moment of inertia method
-    BoundingBox_moi b(&n);
+    BoundingBox b(&n);
     // Principal Component Analisys method
     // BoundingBox_pca b(&n);
     

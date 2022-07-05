@@ -24,7 +24,7 @@
 #include <pcl_ros/transforms.h>
 #include <tf/transform_listener.h>
 
-class BoundingBox_moi {
+class BoundingBox {
     private:
     ros::Publisher bbox_pub;
     ros::Publisher bbox_markers_pub;
@@ -40,9 +40,9 @@ public:
     // function to find BBOX
     void getBBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster, int j, visualization_msgs::Marker &marker, visualization_msgs::Marker &text_marker, lidar_xyz::BoundingBox3D &bbox);
     // Constructor
-    BoundingBox_moi(ros::NodeHandle *n);
+    BoundingBox(ros::NodeHandle *n);
     // Destructor
-    ~BoundingBox_moi();
+    ~BoundingBox();
     };
     
 #endif
