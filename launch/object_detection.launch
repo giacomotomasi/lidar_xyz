@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-    <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch" />
+    
     <rosparam file="$(find lidar_xyz)/config/detector_xyz.yaml" />
     <node name="detector_xyz_node" pkg="lidar_xyz" type="detector_xyz_node" output="screen" />
     <node name="bbox_xyz_node" pkg="lidar_xyz" type="bbox_xyz_node" output="screen" />
