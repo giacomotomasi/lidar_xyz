@@ -48,6 +48,8 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/include
 )
 
+add_dependencies(lidar_xyz lidar_xyz_generate_messages_cpp)
+
 add_executable(detector_xyz_node src/detector_xyz_node.cpp src/Detector_xyz.cpp)
 target_link_libraries(detector_xyz_node ${catkin_LIBRARIES})
 
