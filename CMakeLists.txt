@@ -48,8 +48,6 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/include
 )
 
-add_dependencies(lidar_xyz lidar_xyz_generate_messages_cpp)
-
 add_executable(detector_xyz_node src/detector_xyz_node.cpp src/Detector_xyz.cpp)
 target_link_libraries(detector_xyz_node ${catkin_LIBRARIES})
 
@@ -59,4 +57,6 @@ target_link_libraries(bbox_xyz_node ${catkin_LIBRARIES})
 add_executable(lidar_tf_broadcaster src/lidar_tf_broadcaster.cpp)
 target_link_libraries(lidar_tf_broadcaster ${catkin_LIBRARIES})
 
+add_dependencies(detector_xyz_node lidar_xyz_generate_messages_cpp)
+add_dependencies(bbox_xyz_node lidar_xyz_generate_messages_cpp)
 
